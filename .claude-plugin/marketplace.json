@@ -1,0 +1,35 @@
+{
+  "name": "awrshift-gemini",
+  "owner": {
+    "name": "Serhii Kravchenko",
+    "email": "awrshift@proton.me"
+  },
+  "metadata": {
+    "description": "Gemini inside Claude Code. Second opinions, web-grounded facts, image generation, code visualization, brainstorms.",
+    "version": "1.0.0",
+    "homepage": "https://github.com/awrshift/skill-gemini"
+  },
+  "plugins": [
+    {
+      "name": "gemini",
+      "description": "Gemini inside Claude Code. Ask questions, get second opinions, web-ground facts via Google Search, generate images, visualize code as diagrams, run 3-round adversarial brainstorms. Use when user says 'ask Gemini', 'second opinion', 'ground this', 'verify', 'generate image', 'visualize', 'diagram', 'brainstorm with Gemini', or needs a different model's perspective.",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "productivity",
+      "keywords": [
+        "gemini",
+        "google-ai",
+        "second-opinion",
+        "web-grounding",
+        "image-generation",
+        "visualization",
+        "brainstorm",
+        "multi-model"
+      ],
+      "skills": [
+        "./skills/gemini"
+      ]
+    }
+  ]
+}
