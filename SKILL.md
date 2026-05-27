@@ -1,57 +1,53 @@
 ---
 name: dont-ask-me
-description: "Cross-check Claude's answers with a second AI before bothering the user. Use when the user says 'second opinion', 'sanity check', 'cross-check', 'am I missing something', 'dual validation', 'stress-test', 'review this', 'devil's advocate', 'boardroom debate', 'run a full review', 'this is important', 'big decision', 'high-stakes', 'check before I send', 'before publishing', 'brainstorm options', 'help me choose between', 'I have several options', 'I have N angles', 'multiple paths', 'diverge and converge', 'multi-round brainstorm', 'ask Gemini', 'ask Opus', 'critique this', or any Russian equivalents: 'второе мнение', 'не уверен', 'спроси Gemini', 'спроси Опус', 'критикуй', 'найди слепые пятна', 'помоги выбрать', 'обсуди варианты', 'это важное решение', 'прогони полную проверку'. Three review styles — Devil's Advocate (single critique), Boardroom Debate (parallel dual validation, HEADLINE), Round-Table Discussion (3-round brainstorm for multi-option convergence). Two model families (Gemini + isolated Claude Opus subagent) catch different blind spots. NOT for factual lookups — use Claude Code's native WebSearch instead."
+description: "Cross-check Claude's own answer with a second AI before bringing it to the user. Use when the user says 'second opinion', 'sanity check', 'cross-check', 'am I missing something', 'dual validation', 'stress-test', 'review this', 'devil's advocate', 'boardroom debate', 'run a full review', 'this is important', 'big decision', 'high-stakes', 'check before I send', 'before publishing', 'brainstorm options', 'help me choose between', 'I have several options', 'I have N angles', 'multiple paths', 'diverge and converge', 'multi-round brainstorm', 'ask Gemini', 'ask Opus', 'critique this', or similar phrasing. Three review styles: Devil's Advocate (single critique), Boardroom Debate (parallel dual validation, the headline pattern), Round-Table Discussion (3-round brainstorm for multi-option convergence). Uses two model families (Gemini and an isolated Claude Opus subagent) so the reviewers don't share blind spots. Not for factual lookups; use Claude Code's WebSearch for those."
 allowed-tools: Bash, Read, Glob, Grep, Task, Write
 ---
 
-# Don't Ask Me — Stop being the bottleneck
+# Don't Ask Me
 
-Your AI cross-checks itself with another AI before bothering you. Three review styles, picked automatically based on what the user typed. Two independent model families (Gemini + isolated Claude Opus subagent) catch different blind spots than one model alone.
-
-## What this does (in one sentence)
-
-When the user is unsure, asks a high-stakes question, or proposes a decision that affects shipping, Claude quietly asks Gemini and/or an isolated Opus subagent to review the answer first — then shows the user where the reviewers agreed, disagreed, or caught something the user might miss.
+Cross-check Claude's own answer with a second AI before bringing it to the user. Three review styles, picked automatically by what the user typed. Two model families (Gemini and an isolated Claude Opus subagent) catch different blind spots than one model alone.
 
 ## When to invoke
 
-Four trigger conditions. If any fire, pick the matching review style (see § Style Router below).
+Four trigger conditions. If any of them fires, pick the matching style below.
 
-1. **User has 2+ viable paths to choose between** — architecture options, technology choice, content angle → Round-Table Discussion
-2. **High-stakes design decision** — ADR, architecture, launch copy, anything with rollback cost → Boardroom Debate DEFAULT
-3. **User stuck on the same problem ≥2 attempts** — failed fix, failed retry, considering adding complexity → Devil's Advocate
-4. **Non-trivial proposal awaiting user approval** — new module, refactor plan, multi-step migration → Devil's Advocate or Boardroom Debate depending on stakes
+1. User has two or more viable paths to choose between (architecture options, technology choice, content angle) — use Round-Table Discussion.
+2. High-stakes design decision (ADR, architecture, launch copy, anything where rollback costs something real) — use Boardroom Debate as the default.
+3. User stuck on the same problem after two or more attempts (failed fix, failed retry, about to add another flag or condition) — use Devil's Advocate.
+4. Non-trivial proposal awaiting user approval (new module, refactor plan, multi-step migration) — use Devil's Advocate or Boardroom Debate depending on stakes.
 
-If none fire, do not invoke this skill — single-model answer suffices for routine work.
+If none of these fires, don't invoke the skill. A single-model answer is enough for routine work.
 
-**Out of scope:** factual lookups ("what's the latest X version?", "is Y still free?") — use Claude Code's native WebSearch tool instead. This skill is about critique and adversarial validation, not fact retrieval.
+Out of scope: factual lookups like "what's the latest X version" or "is Y still free". Use Claude Code's native WebSearch for those. This skill is for critique and adversarial validation, not fact retrieval.
 
 ## The three review styles
 
-### 1. Devil's Advocate (Single Critique)
+### 1. Devil's Advocate (single critique)
 
-**Trigger phrases:** "дай второе мнение", "sanity check this", "am I missing something", "stress-test this", "критикуй", "найди слепые пятна"
+Trigger phrases: "sanity check this", "am I missing something", "stress-test this", "critique this", "give me a second opinion".
 
-**Two implementations — Claude picks based on context:**
+Two implementations. Claude picks based on context.
 
-- **(a) Gemini second-opinion** — different model family entirely. Use when claim is about tech/external world or when you want a perspective trained on different data.
-- **(b) idea-validator subagent** — isolated Claude Opus with no parent conversation context. Use when you need to stress-test YOUR reasoning chain without inherited bias from the parent agent's framing.
+(a) Gemini second-opinion. Different model family entirely. Use when the claim is about tech or the external world, or when you want a perspective trained on different data.
 
-**Model (a):** `gemini-3.5-flash` with adversarial reviewer system prompt
-**Model (b):** `claude-opus`, fixed-format output (Verdict / Top 3 concerns / Hidden assumptions / What to verify / Counterargument)
-**Latency:** 10-20 seconds
-**Cost:** $$ tier
+(b) idea-validator subagent. Isolated Claude Opus with no parent conversation context. Use when you need to stress-test your own reasoning chain without inherited bias from the parent framing.
 
-**Decision rule:**
-- Tech/external claim? → Gemini (different training distribution catches different errors)
-- Internal reasoning chain? → Opus subagent (different perspective on same family)
-- Not sure? → Default to Gemini for breadth, Opus for depth
+Model for (a): `gemini-3.5-flash` with an adversarial reviewer system prompt. Latency 10-20 seconds. Cost around 1 cent.
 
-**Example (Gemini):**
+Model for (b): Claude Opus subagent, fixed-format output (Verdict, top 3 concerns, hidden assumptions, what to verify, counterargument). Latency 10-30 seconds. Cost around 3-5 cents.
+
+Decision rule:
+- Tech or external claim: pick Gemini. Different training distribution catches different errors.
+- Internal reasoning chain: pick idea-validator. Same model family but no parent context.
+- Not sure: default to Gemini for breadth, idea-validator for depth.
+
+Example (Gemini):
 ```python
 Bash("python3 ~/.claude/skills/dont-ask-me/scripts/gemini.py second-opinion @prompt.md --save out.md")
 ```
 
-**Example (Opus subagent):**
+Example (Opus subagent):
 ```python
 Agent(
   subagent_type="idea-validator",
@@ -60,175 +56,170 @@ Agent(
 )
 ```
 
-### 2. Boardroom Debate (Dual Validation) — THE HEADLINE PATTERN
+### 2. Boardroom Debate (dual validation, the headline pattern)
 
-**Trigger phrases:** "прогони dual-validation", "это важное решение", "high-stakes review", "give me two independent opinions", "boardroom debate"
+Trigger phrases: "run a full review", "this is important", "give me two independent opinions", "boardroom debate", "high-stakes review".
 
-**Tool:** PARALLEL call to BOTH Gemini second-opinion AND idea-validator Opus subagent in the SAME message.
+Tool: parallel call to both Gemini second-opinion and the idea-validator Opus subagent, in the same message.
 
-**Why parallel matters:** if you call sequentially, the second reviewer sees the first's framing in the artifact you sent — independence destroyed, you get two echoes instead of two minds.
+Same message is non-negotiable. If you call them sequentially, the second reviewer sees the first reviewer's framing in tool results. Independence destroyed. You get two echoes instead of two minds.
 
-**Protocol:**
+Protocol:
 
-0. **Pre-flight check (mandatory):** verify `~/.claude/agents/idea-validator.md` exists before attempting Boardroom Debate. If missing, tell user: "Boardroom Debate requires the idea-validator subagent. Run: `curl -sL https://raw.githubusercontent.com/awrshift/skill-dont-ask-me/main/agents/idea-validator.md -o ~/.claude/agents/idea-validator.md`" — then fall back to Devil's Advocate (single Gemini critique) for the current call.
+0. Pre-flight check. Verify `~/.claude/agents/idea-validator.md` exists before attempting Boardroom Debate. If it's missing, tell the user: "Boardroom Debate needs the idea-validator subagent. Install with: `curl -sL https://raw.githubusercontent.com/awrshift/skill-dont-ask-me/main/agents/idea-validator.md -o ~/.claude/agents/idea-validator.md`". Then fall back to Devil's Advocate (single Gemini critique) for the current call.
 
-1. Claude prepares one self-contained artifact describing the design / decision / plan. Paste content INLINE, never use `@file:` references in the artifact text itself — Gemini Flash will silently hallucinate if `@file:` doesn't load (Session #199 incident: 14 KB audit plan via `@file:` returned a plausible-looking review citing audit IDs D1/F2/C4 that did not exist in the source).
+1. Claude writes one self-contained artifact describing the design, decision, or plan. Paste content inline. Never use `@file:` references in the artifact text — Gemini Flash silently hallucinates if `@file:` fails to load. Session #199 incident: a 14 KB audit plan sent via `@file:` came back as a plausible review citing audit IDs D1, F2, C4 that did not exist in the source.
 
-2. ONE message with TWO tool calls:
+2. One message with two tool calls:
    ```python
-   # Same message:
    Bash("python3 ~/.claude/skills/dont-ask-me/scripts/gemini.py second-opinion @prompt.md --save gemini-out.md")
    Agent(subagent_type="idea-validator", prompt="<same artifact pasted inline>")
    ```
 
-3. Read both outputs, build acceptance ledger:
+3. Read both outputs. Build an acceptance ledger:
 
-   | # | Concern | Gemini says | Opus says | My evaluation | Action |
-   |---|---|---|---|---|---|
+   | Concern | Gemini says | Opus says | My evaluation | Action |
+   |---|---|---|---|---|
 
 4. Three outcome classes per row:
-   - **Both agree** → high-signal, must address
-   - **One raises, other silent** → medium-signal, evaluate whether silent one had context to notice
-   - **They disagree** → HIGHEST-value finding (different model perspectives surfaced different things — investigate which is right and why)
+   - Both agree: high signal, address it.
+   - One raises it, the other silent: medium signal. Evaluate whether the silent one had enough context to notice.
+   - They disagree: highest-value finding. Different model perspectives surfaced different things. Investigate which is right and why.
 
-5. Present BOTH to user critically (per Critical Evaluation Rule below). Don't forward as-is. Show where you accept, where you push back, where reviewers diverge and which side you take with reasoning.
+5. Present the ledger to the user with critical evaluation. Don't forward output as-is. Show where you accept, where you push back, where reviewers diverge and which side you take.
 
-6. Claude makes final decision — this is not voting between two AIs. Two opinions = input, not majority rule.
+6. Claude makes the final decision. The skill is not voting between two AIs. Two opinions are input, not majority rule.
 
-**When to use:** ADR drafts, architecture decisions, multi-step plans (≥3 stages), new patterns before codifying, hypothesis falsification, prompt design for core logic, launch copy for public release, anything where rollback cost is meaningful.
+When to use: ADR drafts, architecture decisions, multi-step plans (three or more dependent stages), new patterns before codifying, hypothesis falsification, prompt design for core logic, launch copy for public release, anything where rollback cost is meaningful.
 
-**Evidence from real history (Session #201 ADR sprint, 2026-05-25):** 6 dual-validations covering 8 architecture decisions (some validations spanned multi-decision batches). EVERY validation found at least one load-bearing problem the proposing agent had missed — 6+ distinct issues total. Examples: BullMQ `limiter` semantics misread (caps execution not enqueue, silent 2-hour SSE stall), LLM "deterministic at temp=0.2" myth (both validators independently flagged non-determinism), indefinite retention plan = GDPR storage limitation violation, pre-call `SELECT SUM` plan = TOCTOU race + 500ms × 50 calls burst stall. Total overhead: ~4% of session time. Issues caught would have cost an entire ADR rewrite or production incident.
+Real evidence (Session #201 ADR sprint, 2026-05-25): 6 dual-validations covered 8 architecture decisions. Every validation found at least one load-bearing problem the proposing agent had missed. Examples: BullMQ `limiter` semantics misread (caps execution, not enqueue, silent 2-hour SSE stall). LLM "deterministic at temp=0.2" myth (both validators independently flagged non-determinism). Indefinite retention plan would have violated GDPR storage limitation. Pre-call `SELECT SUM` plan had a TOCTOU race plus 500ms × 50 calls burst stall. Total overhead: roughly 4% of session time. Issues caught would have cost an entire ADR rewrite or a production incident.
 
-**Latency:** 15-30 seconds (parallel)
-**Cost:** $$$ tier
+Latency: 15-30 seconds parallel. Cost: 5-8 cents per full review.
 
-### 3. Round-Table Discussion (3-Round Brainstorm)
+### 3. Round-Table Discussion (3-round brainstorm)
 
-**Trigger phrases:** "помоги выбрать", "brainstorm options", "we have several paths", "diverge then converge", "multi-round brainstorm", "обсуди варианты"
+Trigger phrases: "help me choose between", "brainstorm options", "we have several paths", "diverge then converge", "multi-round brainstorm".
 
-**Tool:** 3-round structured protocol between Claude and Gemini, with mandatory user check-in mid-flow.
+Tool: structured 3-round protocol between Claude and Gemini, with one mandatory user check-in mid-flow.
 
-**Two-layer model assignment (Flash researches, Pro reasons):**
-- **Flash (grounded):** Phase 0.5 ground + Phase 3.5 fact-check — cheap web verification
-- **Pro (ungrounded):** R1 / R2 / R3 — all thinking tokens spent on critical analysis, not search
-
-**Process:**
+Process:
 
 ```
-Phase 0:   Gather context (what exists, constraints, goal)
-Phase 0.5: GROUND — dual web-check (Claude WebSearch + Flash --grounded in parallel)
-R1: DIVERGE — Pro proposes 7+ ideas, challenges Claude's framing
-R1.5: VERIFY (if R1 introduced new tech) — Flash checks new claims
-R2: DEEPEN — kill to 3 with concrete arguments
-   ★ MANDATORY USER CHECK-IN here — present 2-3 survivors, ask "do you have a preference?"
-R3: CONVERGE — Pro picks ONE primary action, secondary, kill list
-Phase 3.5: FACT-CHECK — verify all R3 claims (dual: Claude + Flash)
-Phase 4: Synthesize — summary table + final recommendation + kill list
+Phase 0    Gather context (what exists, constraints, goal)
+Phase 0.5  GROUND — dual web-check (Claude WebSearch + Flash --grounded in parallel)
+R1         DIVERGE — Gemini proposes 7+ ideas, challenges Claude's framing
+R1.5       VERIFY (if R1 introduced new tech) — Flash checks new claims
+R2         DEEPEN — kill weak ideas down to 3 with concrete arguments
+           MANDATORY USER CHECK-IN — present 2-3 survivors, ask for preference
+R3         CONVERGE — Gemini picks ONE primary action, secondary, kill list
+Phase 3.5  FACT-CHECK — verify all R3 claims (dual: Claude + Flash)
+Phase 4    Synthesize — summary table, final recommendation, kill list
 ```
 
-**Use when:** 2+ viable paths, technology choice, strategy decision, before committing to architecture with multiple defensible options.
+Use when: two or more viable paths, technology choice, strategy decision, before committing to an architecture with multiple defensible options.
 
-**For full protocol with prompt templates per phase**, read `references/round-table.md`.
+Full protocol with prompt templates per phase is in `references/round-table.md`.
 
-**Latency:** 5-10 minutes (multi-turn, includes user check-in)
-**Cost:** $$$$ tier
+Latency: 5-10 minutes (multi-turn, includes user check-in). Cost: about 25 cents.
 
-## Style Router — how Claude picks
+## Style Router
 
-Decision tree, evaluated top-down:
+Decision tree, top-down:
 
-1. Is this a high-stakes design decision (ADR, architecture, launch copy, anything with meaningful rollback cost)? → **Boardroom Debate DEFAULT**
-2. Are there 2+ viable paths to choose between with no clear winner? → **Round-Table Discussion**
-3. Otherwise — stuck on a problem, need critique on a non-trivial proposal, want sanity check? → **Devil's Advocate**
-   - Pick **Gemini second-opinion** if claim is about tech / external world / has different training distribution
-   - Pick **idea-validator Opus** if need to stress-test YOUR reasoning chain without inherited bias
+1. High-stakes design decision (ADR, architecture, launch copy, anything with meaningful rollback cost): Boardroom Debate as default.
+2. Two or more viable paths to choose between with no clear winner: Round-Table Discussion.
+3. Stuck on a problem, need critique on a non-trivial proposal, want a sanity check: Devil's Advocate.
+   - Pick Gemini if the claim is about tech, the external world, or anything with a different training distribution.
+   - Pick idea-validator if you need to stress-test your own reasoning chain without inherited bias.
 
-**Out of router:** factual lookups (current version, price, statistic, recent event) → not this skill. Use Claude Code's native WebSearch tool.
+Out of router: factual lookups (current version, price, statistic, recent event) belong to Claude Code's WebSearch, not this skill.
 
-## Critical Evaluation Rule (applies to ALL styles)
+## Critical Evaluation Rule
 
-Reviewer output is INPUT for decision-making, NOT the decision itself.
+Reviewer output is input for the decision. It is not the decision.
 
 After every reviewer call:
 
-1. **Challenge each recommendation** — is this fact or speculation?
-2. **Check for missing context** — reviewer doesn't see codebase / prior decisions / project constraints
-3. **Verify numbers** — predictions like "90% speedup" are estimates, not measurements
-4. **Look for blind spots** — implementation complexity, side effects, existing code reviewer can't see
-5. **Present critically to user** — table "Reviewer said / My evaluation / Reason / Action"
+1. Challenge each recommendation. Is this a fact or speculation?
+2. Check for missing context. The reviewer doesn't see your codebase, your prior decisions, your constraints.
+3. Verify numbers. Predictions like "90% speedup" are estimates, not measurements.
+4. Look for blind spots: implementation complexity, side effects, code the reviewer can't see.
+5. Present critically. Use a table: reviewer said, my evaluation, reason, action.
 
-**Workflow:** Reviewer recommends → Claude evaluates critically → present BOTH to user → user decides.
+Workflow: reviewer recommends, Claude evaluates critically, Claude presents both to the user, the user decides.
 
-**Anti-patterns:**
-- Forwarding reviewer output as-is without analysis
-- Accepting all recommendations without questioning
-- Using reviewer confidence as proxy for correctness
-- Skipping critical evaluation "because the reviewer is from a different model family / is Opus / is smart"
+Anti-patterns:
+- Forwarding reviewer output as-is.
+- Accepting all recommendations without questioning.
+- Treating reviewer confidence as a proxy for correctness.
+- Skipping critical evaluation because the reviewer is Opus, or Gemini, or "smart".
 
-For why this rule exists with full anti-pattern examples, read `references/critical-evaluation.md`.
+Full anti-pattern examples are in `references/critical-evaluation.md`.
 
-## Own thinking FIRST, reviewer SECOND
+## Own thinking first, reviewer second
 
-Before invoking ANY review style, Claude must have:
+Before invoking any review style, Claude must have:
 
-1. Done its own deep research (read relevant files, prior decisions, source material)
-2. Formed its own proposal with rationale + trade-offs + open questions
-3. Shown that proposal to the user
+1. Done its own deep research (read relevant files, prior decisions, source material).
+2. Formed its own proposal with rationale, trade-offs, and open questions.
+3. Shown the proposal to the user.
 
-ONLY THEN invoke the reviewer to critique that proposal.
+Only then invoke the reviewer to critique that proposal.
 
-**Why:** if Claude goes to Gemini without a thought-through position, it's easy to accept Gemini's recommendation uncritically — Gemini lacks codebase context and can confidently suggest something wrong. Reviewer = validator of YOUR thinking, not the seed of new ideas.
+Why: if Claude goes to Gemini without a thought-through position, it's easy to accept Gemini's recommendation uncritically. Gemini lacks codebase context and can confidently suggest something wrong. The reviewer validates your thinking, it doesn't seed new ideas.
 
-**Trigger sequence:**
-- User asks complex question → Claude researches, synthesizes own answer
-- Claude shows user the answer with reasoning
-- IF stakes are high (per § When to invoke) → Claude offers to cross-check via review style
-- User approves → Claude invokes the chosen style
-- Reviewer returns → Claude evaluates critically, presents ledger
-- User decides
+Trigger sequence:
+- User asks a complex question. Claude researches, synthesizes its own answer.
+- Claude shows the user the answer with reasoning.
+- If stakes are high (per "When to invoke"), Claude offers to cross-check via a review style.
+- User approves. Claude invokes the chosen style.
+- Reviewer returns. Claude evaluates critically and presents the ledger.
+- User decides.
 
-Skipping step 1-3 and asking Gemini first = anti-pattern. Codified Session #142 after L4.1 topic clusterer where this exact mistake was caught.
+Skipping steps 1-3 and asking Gemini first is the anti-pattern. Codified Session #142 after the L4.1 topic clusterer where this exact mistake was caught.
 
-## Cost rules — when expensive styles are justified
+## Cost rules
 
 | Style | Cost per call | When justified |
 |---|---|---|
-| Devil's Advocate (Gemini) | ~$0.01 | Non-trivial decisions, prompt before finalizing, stuck after ≥2 attempts |
+| Devil's Advocate (Gemini) | ~$0.01 | Non-trivial decisions, prompt before finalizing, stuck after 2+ attempts |
 | Devil's Advocate (Opus subagent) | ~$0.03-0.05 | Reasoning chain stress-test, fresh adversarial perspective |
 | Boardroom Debate (parallel both) | ~$0.05-0.08 | High-stakes: ADR, architecture, launch copy, anything with rollback cost |
 | Round-Table Discussion (3-round) | ~$0.25 | Multi-path strategy decisions, technology choice, before committing to architecture |
 
-**Rule of thumb:** cost of validating < cost of being wrong × probability of wrong.
+Rule of thumb: cost of validating is less than cost of being wrong times probability of wrong.
 
-**Real cost reality (Session #201 ADR sprint):** 8 decisions, 6 dual-validations (some batched), ~60s overhead each = ~6 minutes total. ADR took ~3 hours. Validation overhead = ~4% of session time. Caught 6+ load-bearing issues. Obvious ROI for ADR-class work.
+Real cost reality (Session #201 ADR sprint): 8 decisions, 6 dual-validations (some batched), about 60 seconds overhead each. Total: 6 minutes. The ADR took about 3 hours. Validation overhead was around 4% of session time. Caught 6+ load-bearing issues. Obvious ROI for ADR-class work.
 
-## Anti-patterns (do NOT do these)
+## Anti-patterns
 
-1. **Sequential parallel calls** — running Gemini THEN Opus destroys independence. Same message, two tool calls. (Per `references/dual-validation.md`.)
+1. Sequential parallel calls. Running Gemini then Opus destroys independence. Same message, two tool calls. See `references/dual-validation.md`.
 
-2. **`@file:` references in Gemini prompts** — Gemini Flash silently hallucinates content when `@file:` fails to load. Returns plausible-looking review with citations that don't exist in source. ALWAYS paste content INLINE. ALWAYS verify identifiers in response match input (scan for 2-3 IDs, throw out if even one doesn't match). Codified Session #199 (2026-05-24) after 14 KB audit plan incident.
+2. `@file:` references in Gemini prompts. Gemini Flash silently hallucinates content when `@file:` fails to load. Always paste content inline. Always verify identifiers in the response match your input. Scan for 2-3 IDs and throw out the response if even one doesn't match. Codified Session #199 (2026-05-24) after the 14 KB audit plan incident.
 
-3. **Asking Gemini BEFORE forming own opinion** — turns Gemini into a seed for the decision, not a validator. Do your own deep thinking first. Codified Session #142 (2026-05-16) on L4.1 topic clusterer.
+3. Asking Gemini before forming your own opinion. Turns Gemini into a seed for the decision instead of a validator. Codified Session #142 (2026-05-16) on the L4.1 topic clusterer.
 
-4. **Boardroom Debate for trivial things** — burns tokens for stylistic preferences (file naming, format choices, code style with project rules). Save dual validation for genuinely high-stakes design moments.
+4. Boardroom Debate for trivial things. Burns tokens on stylistic preferences (file naming, format choices, code style with project rules). Save dual validation for genuinely high-stakes moments.
 
-5. **Accepting reviewer output as-is** — same Critical Evaluation Rule applies. Output is INPUT for decisions, not the decision. Two opinions ≠ majority rule.
+5. Accepting reviewer output as-is. Same Critical Evaluation Rule applies. Output is input for decisions, not the decision. Two opinions are not a majority rule.
 
-6. **Using `gemini think` for code review** — Claude subagents (Task tool) can READ files and follow imports. Gemini cannot. Use Claude subagent for file-aware code review, Gemini for independent reasoning without codebase access.
+6. Using `gemini think` for code review. Claude subagents (via Task tool) can read files and follow imports. Gemini cannot. Use Claude subagent for file-aware code review. Use Gemini for independent reasoning without codebase access.
 
-## CLI Reference (for direct invocation when Claude needs custom params)
+## CLI Reference
+
+For direct invocation when Claude needs custom params.
 
 ```bash
-GEMINI="$(find . ~/.claude/skills -name gemini.py -path '*/dont-ask-me/*' 2>/dev/null | head -1)"
+GEMINI=~/.claude/skills/dont-ask-me/scripts/gemini.py
 
-# Web-grounded ask (used internally by Round-Table Phase 0.5 + 3.5 for tech verification —
-# NOT a user-facing review style. For factual lookups, use Claude Code's native WebSearch.)
+# Web-grounded ask (used internally by Round-Table Phase 0.5 + 3.5 for tech verification.
+# Not a user-facing review style. For factual lookups, use Claude Code's native WebSearch.)
 python3 $GEMINI ask "Verify these technologies: A, B, C" --grounded
 
-# Devil's Advocate — single critique
+# Devil's Advocate, single critique
 python3 $GEMINI second-opinion @prompt.txt --save out.md
 
-# Boardroom Debate — paired with Agent call to idea-validator in same Claude message
+# Boardroom Debate, paired with Agent call to idea-validator in same Claude message
 python3 $GEMINI second-opinion @prompt.txt --save gemini-out.md
 
 # Deep reasoning
@@ -242,31 +233,33 @@ python3 $GEMINI extract "Parse this invoice..." --json-mode
 ```
 
 | Command | Default Model | Use When |
-|---------|---------------|----------|
+|---|---|---|
 | `ask` | `gemini-3.5-flash` | Quick questions, research with `--grounded` |
 | `second-opinion` | `gemini-3.5-flash` (adversarial system prompt) | Devil's Advocate, Boardroom Debate (paired with Opus) |
 | `think` | `gemini-3.5-flash` (high thinking) | Complex reasoning, architecture sketch |
 | `extract` | `gemini-3.5-flash` (JSON mode) | Structured extraction from unstructured text |
 
-Legacy: `gemini-3.1-pro-preview` available via `-m` flag for pure-math reasoning (ARC-AGI-style) where Flash 3.5 falls short. Post-audit 2026-05-20, Flash 3.5 beat Pro by 5 findings, 22% faster, 33% cheaper, 0 factual errors — Pro retained only as legacy fallback.
+Legacy: `gemini-3.1-pro-preview` available via `-m` flag for pure-math reasoning (ARC-AGI-style) where Flash 3.5 falls short. Post-audit 2026-05-20, Flash 3.5 beat Pro by 5 findings, ran 22% faster, cost 33% less, produced 0 factual errors. Pro retained only as legacy fallback.
 
-## Setup (4 steps, one-time)
+## Setup
 
-1. **Get Gemini API key** at [aistudio.google.com](https://aistudio.google.com) → Create API Key
-2. **Add to `.env`:** `GOOGLE_API_KEY=your_key_here`
-3. **Install SDK:** `pip install google-genai`
-4. **Install idea-validator subagent** (required for Boardroom Debate):
+Four steps, one-time.
+
+1. Get a Gemini API key at [aistudio.google.com](https://aistudio.google.com). Click "Create API Key".
+2. Add `GOOGLE_API_KEY=your_key_here` to your `.env` file.
+3. Run `pip install google-genai`.
+4. Install the idea-validator subagent (required for Boardroom Debate):
    ```bash
    mkdir -p ~/.claude/agents
    curl -sL https://raw.githubusercontent.com/awrshift/skill-dont-ask-me/main/agents/idea-validator.md \
      -o ~/.claude/agents/idea-validator.md
    ```
 
-(Or one-line install via plugin marketplace: `/plugin marketplace add awrshift/skill-dont-ask-me` — handles all four steps.)
+The plugin marketplace install (`/plugin marketplace add awrshift/skill-dont-ask-me`) handles all four steps.
 
-## Multimodal — images and video
+## Multimodal: images and video
 
-Pass `--image` (repeatable) or `--video` (URL or local file) to any text command:
+Pass `--image` (repeatable) or `--video` (URL or local file) to any text command.
 
 ```bash
 # Compare two designs visually
@@ -276,11 +269,11 @@ python3 $GEMINI second-opinion "compare designs, score 1-10" --image ours.png --
 python3 $GEMINI ask "summarize this video" --video https://youtube.com/watch?v=ID
 ```
 
-Supported images: PNG, JPEG, WebP, GIF (max ~20 MB total). Gemini 3.x natively multimodal. Use case examples: design review, visual QA, screenshot diff, accessibility audit.
+Supported images: PNG, JPEG, WebP, GIF, max about 20 MB total. Gemini 3.x is natively multimodal. Use cases: design review, visual QA, screenshot diff, accessibility audit.
 
-## Parallel execution (advanced)
+## Parallel execution
 
-When you have multiple independent aspects to validate:
+When you have multiple independent aspects to validate, run them concurrently.
 
 ```bash
 python3 $GEMINI second-opinion @aspect1.txt --save r1.md &
@@ -289,47 +282,44 @@ python3 $GEMINI second-opinion @aspect3.txt --save r3.md &
 wait
 ```
 
-All run concurrently. Useful for multi-axis review (security + performance + readability in parallel).
+Useful for multi-axis review like security plus performance plus readability in parallel.
 
-## References (read on-demand)
+## References
 
-- **`references/round-table.md`** — Full 3-round brainstorm protocol with phase-by-phase prompt templates
-- **`references/dual-validation.md`** — Parallel call protocol, acceptance ledger format, three outcome classes
-- **`references/decision-framework.md`** — When to use Gemini vs Claude subagents vs Opus subagent
-- **`references/critical-evaluation.md`** — Why reviewer output ≠ decision, with anti-pattern examples
-- **`references/models.md`** — All Gemini models, pricing, thinking levels, deprecation table
-- **`references/parameters.md`** — Complete CLI argument reference
+Read on demand.
+
+- `references/round-table.md` — Full 3-round brainstorm protocol with phase-by-phase prompt templates.
+- `references/dual-validation.md` — Parallel call protocol, acceptance ledger format, three outcome classes.
+- `references/decision-framework.md` — When to use Gemini vs Claude subagents vs Opus subagent.
+- `references/critical-evaluation.md` — Why reviewer output is not the decision, with anti-pattern examples.
+- `references/models.md` — Gemini model specs, pricing, thinking levels, deprecation table.
+- `references/parameters.md` — Complete CLI argument reference.
 
 ## Migrating from skill-gemini or skill-brainstorm
 
 If you previously installed `awrshift/skill-gemini` or `awrshift/skill-brainstorm`:
 
-1. **Uninstall old:** `/plugin marketplace remove awrshift/skill-gemini` (and/or `awrshift/skill-brainstorm`)
-2. **Install new:** `/plugin marketplace add awrshift/skill-dont-ask-me`
-3. **All previous CLI commands work unchanged** — `gemini.py ask`, `second-opinion`, `think`, `extract`, `--grounded`, `--image` all behave identically. Just point to `~/.claude/skills/dont-ask-me/scripts/gemini.py` instead of `~/.claude/skills/gemini/gemini.py`.
-4. **New capabilities added:**
-   - Boardroom Debate (parallel dual validation with idea-validator subagent)
-   - Round-Table Discussion (3-round brainstorm — was `skill-brainstorm`)
-   - Style Router (Claude auto-picks based on user phrasing)
-   - Critical Evaluation Rule (explicit anti-patterns)
+1. Uninstall: `/plugin marketplace remove awrshift/skill-gemini` (and/or `awrshift/skill-brainstorm`).
+2. Install: `/plugin marketplace add awrshift/skill-dont-ask-me`.
+3. All previous CLI commands work unchanged: `gemini.py ask`, `second-opinion`, `think`, `extract`, `--grounded`, `--image` behave identically. Point to `~/.claude/skills/dont-ask-me/scripts/gemini.py` instead of `~/.claude/skills/gemini/gemini.py`.
+4. New capabilities: Boardroom Debate (parallel dual validation with idea-validator subagent), Round-Table Discussion (was skill-brainstorm), Style Router (Claude picks based on user phrasing), Critical Evaluation Rule (explicit anti-patterns).
 
-`awrshift/skill-brainstorm` is archived with pointer to this skill (functionality fully merged).
-`awrshift/skill-gemini` is renamed to `awrshift/skill-dont-ask-me` (GitHub redirect handles old install URLs).
+`awrshift/skill-brainstorm` is archived with a pointer to this skill (functionality fully merged).
 
----
+`awrshift/skill-gemini` was renamed to `awrshift/skill-dont-ask-me` (GitHub redirect handles old install URLs).
 
-## Why two model families matter (in 30 seconds)
+## Why two model families
 
-If both reviewers are from the same lab (e.g., two Claude instances), they share training distribution, same blind spots, similar reasoning failure modes. You get two echoes, not two minds.
+If both reviewers come from the same lab, they share training distribution, the same blind spots, similar reasoning failure modes. Two echoes, not two minds.
 
-**Gemini (Google)** has different training data, different reasoning patterns, different post-training feedback loops than Claude (Anthropic). Where Claude misses, Gemini sometimes catches. Where Gemini misses, Claude catches.
+Gemini (Google) has different training data, different reasoning patterns, different post-training feedback loops than Claude (Anthropic). Where Claude misses, Gemini sometimes catches. Where Gemini misses, Claude catches.
 
-**Isolated Opus subagent** is same family as parent Claude — but without inherited context. It cannot anchor on the parent's framing, can't be primed by prior conversation. Fresh adversarial perspective on the artifact.
+The isolated Opus subagent is the same family as the parent Claude, but without inherited context. It can't anchor on the parent's framing or be primed by prior conversation. Fresh adversarial perspective on the artifact.
 
-**Boardroom Debate uses both** because:
-- Gemini catches what Anthropic-family models miss (external optics, different training distribution)
-- Opus subagent catches what's wrong with YOUR reasoning chain (internal logic without parent bias)
+Boardroom Debate uses both because:
+- Gemini catches what Anthropic-family models miss (external optics, different training distribution).
+- The Opus subagent catches what's wrong with your own reasoning chain (internal logic without parent bias).
 
-Single reviewer = one angle. Two reviewers from different families = two angles, not two voices.
+Single reviewer is one angle. Two reviewers from different families are two angles, not two voices.
 
-Evidence: Phase D experiment A433. Same Gemini model with basic prompt = 50% accuracy. Same model + prompt stress-tested by Gemini itself = 75-80%. The model wasn't the bottleneck — the prompt was. Different model family caught the prompt's blind spots that Claude couldn't see from inside.
+Evidence: Phase D experiment A433. Same Gemini model with a basic prompt scored 50%. Same model with a prompt that Gemini itself had stress-tested scored 75-80%. The model wasn't the bottleneck. The prompt was. A different model family caught the prompt's blind spots Claude couldn't see from inside.
