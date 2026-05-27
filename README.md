@@ -12,17 +12,20 @@
 
 ---
 
-![](assets/carousel/01-choice.png)
-
-![](assets/carousel/02-repeat.png)
-
-![](assets/carousel/03-cheat-code.png)
-
-![](assets/carousel/04-isolated.png)
-
-![](assets/carousel/05-synthesis.png)
-
-![](assets/carousel/06-ship.png)
+<table>
+<tr>
+<td width="50%"><img src="assets/carousel/01-choice.png" alt="Choice with no choice"></td>
+<td width="50%"><img src="assets/carousel/02-repeat.png" alt="x50 times a day"></td>
+</tr>
+<tr>
+<td width="50%"><img src="assets/carousel/03-cheat-code.png" alt="The cheat code: ask Gemini"></td>
+<td width="50%"><img src="assets/carousel/04-isolated.png" alt="Different family, different blind spots"></td>
+</tr>
+<tr>
+<td width="50%"><img src="assets/carousel/05-synthesis.png" alt="Not consensus, not voting"></td>
+<td width="50%"><img src="assets/carousel/06-ship.png" alt="Ship with conviction"></td>
+</tr>
+</table>
 
 ---
 
