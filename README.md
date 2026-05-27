@@ -6,19 +6,23 @@
 
 # Don't Ask Me
 
-**Cross-check Claude's answer with a second AI before you trust it.**
+**Stop nodding when AI hands you "options". Built-in second opinion from a model that doesn't share Claude's blind spots.**
 
 </div>
 
 ---
 
-![](assets/memes/01-trap.png)
+![](assets/carousel/01-choice.png)
 
-![](assets/memes/02-forest.png)
+![](assets/carousel/02-repeat.png)
 
-![](assets/memes/03-deploy.png)
+![](assets/carousel/03-cheat-code.png)
 
-![](assets/memes/04-advice.png)
+![](assets/carousel/04-isolated.png)
+
+![](assets/carousel/05-synthesis.png)
+
+![](assets/carousel/06-ship.png)
 
 ---
 
@@ -63,7 +67,7 @@ If none of these fit, just describe what you're stuck on. Claude figures out whi
 
 ## Full docs
 
-[**SKILL.md**](SKILL.md) — how it works, when to invoke, anti-patterns, CLI reference.
+[**SKILL.md**](skills/dont-ask-me/SKILL.md) — how it works, when to invoke, anti-patterns, CLI reference.
 
 ## License
 
