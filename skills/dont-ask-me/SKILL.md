@@ -243,19 +243,19 @@ Legacy: `gemini-3.1-pro-preview` available via `-m` flag for pure-math reasoning
 
 ## Setup
 
-Four steps, one-time.
+The plugin marketplace install (`/plugin marketplace add awrshift/skill-dont-ask-me`) copies all skill files and the `idea-validator` subagent into the right places — but it cannot configure your API key or Python environment. Three manual steps remain:
 
 1. Get a Gemini API key at [aistudio.google.com](https://aistudio.google.com). Click "Create API Key".
 2. Add `GOOGLE_API_KEY=your_key_here` to your `.env` file.
 3. Run `pip install google-genai`.
-4. Install the idea-validator subagent (required for Boardroom Debate):
-   ```bash
-   mkdir -p ~/.claude/agents
-   curl -sL https://raw.githubusercontent.com/awrshift/skill-dont-ask-me/main/agents/idea-validator.md \
-     -o ~/.claude/agents/idea-validator.md
-   ```
 
-The plugin marketplace install (`/plugin marketplace add awrshift/skill-dont-ask-me`) handles all four steps.
+If you install the skill manually (without the plugin marketplace), also copy the subagent into place so Boardroom Debate can find it:
+
+```bash
+mkdir -p ~/.claude/agents
+curl -sL https://raw.githubusercontent.com/awrshift/skill-dont-ask-me/main/agents/idea-validator.md \
+  -o ~/.claude/agents/idea-validator.md
+```
 
 ## Multimodal: images and video
 
