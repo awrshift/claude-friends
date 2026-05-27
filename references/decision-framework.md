@@ -13,20 +13,22 @@
 
 - **Independent second opinion** — different model family = different biases
 - **Quick stateless questions** — `ask` (<3s, cheap)
-- **Fact-check verification** — cross-validate Claude's analysis with Gemini 3.1 Pro
+- **Fact-check verification** — cross-validate Claude's analysis with Gemini 3.5 Flash
 - **Parallel batch calls** — 4+ background processes via `&` + `wait`
+- **Dual validation (advanced)** — `idea-validator` sub-agent (Opus, isolated) + `gemini.py second-opinion` (3.5 Flash) in parallel for high-stakes design decisions. See `references/dual-validation.md`
 
 ## Model Selection Quick Reference
 
 | Need | Best option | Fallback |
 |------|------------|----------|
 | Parallel file-aware work | `Task(model="sonnet")` | — |
-| Deep reasoning | `Task(model="opus")` | `gemini.py think` (3.1 Pro, HIGH) |
-| **Second opinion** | **`gemini.py second-opinion` (3.1 Pro)** | `gemini.py ask -m gemini-3-flash-preview` |
-| Quick question | `gemini.py ask` (3 Flash) | — |
-| Research / fact-check | `gemini.py ask -m gemini-3.1-flash-lite-preview --grounded` | — |
-| Data extraction | `gemini.py extract` (Flash-Lite, MINIMAL) | — |
-| Image generation | `gemini_image` MCP tool (Flash default) | Pro for best quality |
+| Deep reasoning | `Task(model="opus")` | `gemini.py think` (3.5 Flash, HIGH) |
+| **Second opinion** | **`gemini.py second-opinion` (3.5 Flash)** | `gemini.py second-opinion -m gemini-3.1-pro-preview` for pure-math |
+| Dual validation (high-stakes) | `idea-validator` Agent + `gemini.py second-opinion` in parallel | single second-opinion |
+| Quick question | `gemini.py ask` (Flash default) | — |
+| Research / fact-check | `gemini.py ask --grounded` (Flash default) | — |
+| Data extraction | `gemini.py extract` (Flash, LOW) | — |
+| Visual review (image input) | `gemini.py second-opinion --image` (multimodal CLI) | — |
 
 ## DO NOT Use Gemini For
 

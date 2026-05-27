@@ -46,7 +46,7 @@ Last updated: 2026-03-11 (web-verified from ai.google.dev, cloud.google.com, goo
 |-------|---------|-----|--------|------|
 | `gemini-3.1-pro-preview` | NO | YES | **YES** (new in 3.1) | YES (default) |
 | `gemini-3-flash-preview` | YES | YES | YES | YES (default) |
-| `gemini-3.1-flash-lite-preview` | YES | YES | YES | YES (default) |
+| `gemini-3.5-flash` | YES | YES | YES | YES (default) |
 
 **Key facts:**
 - Thinking cannot be turned off for Pro models (MINIMAL not supported).
@@ -97,7 +97,7 @@ Last updated: 2026-03-11 (web-verified from ai.google.dev, cloud.google.com, goo
 
 ## Model Specifications (March 2026)
 
-| Spec | 3.1 Pro | 3 Flash | 3.1 Flash-Lite |
+| Spec | 3.1 Pro | 3 Flash | 3.5 Flash |
 |------|---------|---------|----------------|
 | Input tokens | 1,048,576 (1M) | 1,048,576 (1M) | 1,048,576 (1M) |
 | Output tokens | 65,536 (64K) | 65,536 (64K) | 65,536 (64K) |
@@ -122,7 +122,7 @@ Gemini 3 uses **Thought Signatures** — encrypted representations of internal r
 
 ## Optimal Parameter Presets for Our Skills
 
-### Research (Phase 0.5, 3.5 — Flash-Lite grounded)
+### Research (Phase 0.5, 3.5 — Flash grounded)
 ```python
 config = types.GenerateContentConfig(
     temperature=1.0,       # Keep default — Gemini 3 optimized for 1.0
@@ -148,7 +148,7 @@ config = types.GenerateContentConfig(
 )
 ```
 
-### Data Extraction (extract — Flash-Lite)
+### Data Extraction (extract — Flash)
 ```python
 config = types.GenerateContentConfig(
     temperature=0.2,       # Low randomness for structured output
@@ -173,6 +173,22 @@ config = types.GenerateContentConfig(
 4. **Grounding = Tool** — Google Search is a tool, not a parameter: `tools=[types.Tool(google_search=types.GoogleSearch())]`.
 5. **Seed for reproducibility** — Same seed + same prompt = same output (best effort, not guaranteed).
 6. **Penalties for long-form** — Use `presence_penalty` (0.1–0.5) and `frequency_penalty` (0.1–0.5) to reduce repetition in long outputs.
+
+## 2026 Breaking Changes (audited 2026-05-20)
+
+These are explicit API-shape changes from the past 6 months. Old code patterns will fail.
+
+1. **Function call IDs are mandatory on Gemini 3.** Each function call generates a unique `id`. When returning `function_response`, you MUST echo the matching `id`. Pre-Gemini-3 code that omits `id` is deprecated. This breaks multi-turn + tool chaining if forgotten.
+
+2. **Implicit context caching is default for Gemini 2.5+.** Minimum cacheable: 1,024 tokens (Flash family), 4,096 tokens (Pro). No setup needed for cost savings — manual cache only for high-volume repeated queries with custom TTL.
+
+3. **Python SDK migrated to `google-genai`.** Older `google-generativeai` package is legacy. Canonical import: `from google import genai`.
+
+4. **`thinking_level` is the Gemini 3 way; `thinking_budget` is Gemini 2.5 only.** Mixing in same request = 400 error.
+
+5. **Grounding billing changed for Gemini 3.** Google Search grounding is billed per **unique search query executed** (not per prompt as for older models). Free tier: 5,000 queries/month, then $14 per 1,000.
+
+6. **Model name conventions:** `gemini-3.5-flash` is stable (NO `-preview` suffix). `gemini-3.1-pro-preview` is preview. Legacy names (`gemini-pro`, `gemini-pro-vision`) are removed.
 
 ## Sources
 

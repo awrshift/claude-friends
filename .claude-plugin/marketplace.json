@@ -1,34 +1,38 @@
 {
-  "name": "awrshift-gemini",
+  "name": "awrshift-dont-ask-me",
   "owner": {
     "name": "Serhii Kravchenko",
     "email": "awrshift@proton.me"
   },
   "metadata": {
-    "description": "Gemini inside Claude Code. Second opinions, web-grounded facts, image generation, code visualization, brainstorms.",
-    "version": "1.0.0",
-    "homepage": "https://github.com/awrshift/skill-gemini"
+    "description": "Cross-check Claude's answers with Gemini + isolated Opus subagent before bothering you. Four review styles, auto-picked by what you type. CLI-only.",
+    "version": "2.0.0",
+    "homepage": "https://github.com/awrshift/skill-dont-ask-me"
   },
   "plugins": [
     {
-      "name": "gemini",
-      "description": "Gemini inside Claude Code. Ask questions, get second opinions, web-ground facts via Google Search, generate images, visualize code as diagrams, run 3-round adversarial brainstorms. Use when user says 'ask Gemini', 'second opinion', 'ground this', 'verify', 'generate image', 'visualize', 'diagram', 'brainstorm with Gemini', or needs a different model's perspective.",
+      "name": "dont-ask-me",
+      "description": "Stop being the bottleneck. Your AI cross-checks itself with Gemini (different model family) and an isolated Opus subagent (same family, no parent context) before answering. Four review styles auto-picked by what you type: Quick Web Check (facts via grounded search), Devil's Advocate (single critique), Boardroom Debate (parallel dual-validation, the headline pattern), Round-Table Discussion (3-round Claude × Gemini brainstorm for multi-option convergence). Two-model setup: 3.5 Flash primary, 3.1 Pro fallback. CLI-only, no MCP. Merges previous skill-gemini + skill-brainstorm into one.",
       "source": "./",
       "strict": false,
-      "version": "1.0.0",
+      "version": "2.0.0",
       "category": "productivity",
       "keywords": [
-        "gemini",
-        "google-ai",
         "second-opinion",
-        "web-grounding",
-        "image-generation",
-        "visualization",
+        "dual-validation",
+        "cross-check",
+        "fact-check",
+        "boardroom-debate",
+        "devils-advocate",
         "brainstorm",
-        "multi-model"
+        "multi-model",
+        "gemini",
+        "opus-subagent",
+        "adversarial-review",
+        "round-table"
       ],
       "skills": [
-        "./skills/gemini"
+        "./skills/dont-ask-me"
       ]
     }
   ]
