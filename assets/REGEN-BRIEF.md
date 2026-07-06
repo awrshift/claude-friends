@@ -1,7 +1,12 @@
 # Graphics regeneration brief — Claude Friends
 
-The carousel + banner still carry the old "Don't Ask Me / ask Gemini" narrative. This brief re-scripts
-them for **Claude Friends** ("ask your friends"). Keep the existing look so the set stays coherent.
+> **STATUS (2026-07-06): carousel DONE.** Slides 03–06 regenerated with Gemini 3 Pro Image
+> (Nano Banana Pro), style-locked against slide 01 — new files `03-friends` / `04-blindspots` /
+> `05-notavote` / `06-decide`. Slides 01–02 (the problem) kept as-is. This brief stays as the design
+> record + the prompt recipe for future re-runs. (There is no banner in this repo — `og-banner` lives
+> in claude-memory-kit.)
+
+This brief re-scripts the carousel for **Claude Friends** ("ask your friends"). Keep the existing look so the set stays coherent.
 
 ## Style lock (all slides)
 - Hand-drawn black-ink **stick-figure comic** (xkcd / whiteboard doodle), white background, thin black border box.
