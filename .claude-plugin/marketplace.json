@@ -1,38 +1,38 @@
 {
-  "name": "awrshift-dont-ask-me",
+  "name": "awrshift-claude-friends",
   "owner": {
     "name": "Serhii Kravchenko",
     "email": "awrshift@proton.me"
   },
   "metadata": {
-    "description": "Cross-check Claude's own answer with a second AI before bringing it to the user. Three review styles, picked automatically by what you type. CLI-only, English-only docs.",
-    "version": "2.2.0",
-    "homepage": "https://github.com/awrshift/skill-dont-ask-me"
+    "description": "Claude has friends. On the calls that matter, it asks AIs from other families — Gemini, an isolated second Claude, optionally GPT — who catch the blind spots Claude can't see from the inside. Three styles, auto-picked by what you type. CLI-only, English-only docs.",
+    "version": "3.0.0",
+    "homepage": "https://github.com/awrshift/claude-friends"
   },
   "plugins": [
     {
-      "name": "dont-ask-me",
-      "description": "Stop being the bottleneck. Your AI cross-checks itself with Gemini (different model family) and an isolated Opus subagent (same family, no parent context) before answering. Three review styles auto-picked by what you type: Devil's Advocate (single critique), Boardroom Debate (parallel dual-validation, the headline pattern), Round-Table Discussion (3-round Claude × Gemini brainstorm for multi-option convergence). Two-model setup: 3.5 Flash primary, 3.1 Pro fallback. CLI-only, no MCP. Merges previous skill-gemini + skill-brainstorm into one.",
+      "name": "claude-friends",
+      "description": "Claude doesn't decide alone. On the calls that matter it asks its friends — Gemini (a different model family) and an isolated Claude with fresh eyes (same family, no parent context), optionally OpenAI GPT — who each catch blind spots the others miss. Three styles auto-picked by what you type: Devil's Advocate (one friend, quick critique), Boardroom Debate (the whole table in parallel, the headline pattern), Round-Table Discussion (3-round brainstorm for multi-option convergence). Not a second opinion you drag out of a reluctant assistant — a room of friends you trust. CLI-only, no MCP. Merges previous skill-gemini + skill-brainstorm + dont-ask-me.",
       "source": "./",
       "strict": false,
-      "version": "2.2.0",
+      "version": "3.0.0",
       "category": "productivity",
       "keywords": [
-        "second-opinion",
-        "dual-validation",
+        "claude-friends",
+        "ask-your-friends",
+        "multi-model",
         "cross-check",
-        
         "boardroom-debate",
         "devils-advocate",
         "brainstorm",
-        "multi-model",
         "gemini",
+        "gpt",
         "opus-subagent",
-        "adversarial-review",
+        "second-opinion",
         "round-table"
       ],
       "skills": [
-        "./skills/dont-ask-me"
+        "./skills/claude-friends"
       ]
     }
   ]

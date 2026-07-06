@@ -1,6 +1,6 @@
-# Gemini Models Reference — Don't Ask Me skill
+# Gemini Models Reference — Claude Friends skill
 
-Last updated: 2026-05-27. **Whitelist reduced to 2 models** — `gemini-3.5-flash` (primary for all tasks) and `gemini-3.1-pro-preview` (fallback for pure-math reasoning where Flash falls short).
+Last updated: 2026-05-27 · re-verified 2026-07-06 against official `ai.google.dev` models + pricing (whitelist UNCHANGED). **Whitelist = 2 models** — `gemini-3.5-flash` (primary for all tasks, still GA/stable, pricing unchanged $1.50/$9) and `gemini-3.1-pro-preview` (fallback for pure-math reasoning where Flash falls short, still Preview). Nothing has displaced 3.5 Flash as the API's top general model. Note (2026-06-24): 3.5 Flash's *bare* default thinking effort moved HIGH→MEDIUM, but `second-opinion`/`think` pass HIGH explicitly, so they are unaffected.
 
 ## Whitelisted Models
 
@@ -95,14 +95,14 @@ Gemini 3 models generate a unique `id` per function call. When returning functio
 
 Previously supported, now removed for simplicity and cost discipline:
 
-| Model | Status | Replacement |
+| Model | Status (verified 2026-07-06) | Replacement |
 |-------|--------|-------------|
-| `gemini-3.1-flash-lite` | Removed | `gemini-3.5-flash` (handles all same use cases including grounded research) |
-| `gemini-3.1-flash-lite-preview` | Removed | `gemini-3.5-flash` |
-| `gemini-3-flash-preview` | Removed (2026-05-20 audit) | `gemini-3.5-flash` |
-| `gemini-3-pro-preview` | SHUT DOWN (March 9, 2026) | `gemini-3.1-pro-preview` |
-| `gemini-2.5-pro` / `gemini-2.5-flash` / `gemini-2.5-flash-lite` | Superseded | `gemini-3.5-flash` |
-| `gemini-2.0-flash` / `gemini-2.0-flash-lite` | Retiring | `gemini-3.5-flash` |
+| `gemini-3.1-flash-lite` | **GA 2026-05-07** (alive, $0.25/$1.50) but OFF-whitelist by discipline | `gemini-3.5-flash` for quality; flash-lite only for explicit high-volume scale |
+| `gemini-3.1-flash-lite-preview` | **SHUT DOWN 2026-05-25** | `gemini-3.1-flash-lite` (GA) or `gemini-3.5-flash` |
+| `gemini-3-flash-preview` | Alive (Preview, Dec 2025) but OFF-whitelist; Google says migrate | `gemini-3.5-flash` |
+| `gemini-3-pro-preview` | SHUT DOWN 2026-03-09 | `gemini-3.1-pro-preview` |
+| `gemini-2.5-pro` / `gemini-2.5-flash` / `gemini-2.5-flash-lite` | Deprecated — retire ≥2026-10-16 | `gemini-3.5-flash` |
+| `gemini-2.0-flash` / `gemini-2.0-flash-lite` | **SHUT DOWN 2026-06-01** (hardcoded calls now FAIL) | `gemini-3.5-flash` |
 
 ## Google Search Grounding
 
