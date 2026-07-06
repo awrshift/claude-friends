@@ -38,9 +38,14 @@
 Then set your Gemini key (free tier at [aistudio.google.com](https://aistudio.google.com)):
 
 ```bash
-echo 'GOOGLE_API_KEY=your_key_here' >> ~/.env
 pip install google-genai
+
+# Store the key once — read automatically by every shell, no `export` needed:
+mkdir -p ~/.gemini && printf '%s' 'your_key_here' > ~/.gemini/api_key && chmod 600 ~/.gemini/api_key
 ```
+
+> Prefer an env var? `export GOOGLE_API_KEY=your_key_here` works too and overrides the file.
+> A bare `GOOGLE_API_KEY=...` line in `~/.env` will **not** work — nothing sources it in a fresh shell.
 
 ## Three modes — Claude picks one based on what you type
 

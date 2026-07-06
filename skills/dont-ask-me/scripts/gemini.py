@@ -2,18 +2,16 @@
 """
 Gemini SDK CLI — direct Google GenAI calls via Python subprocess.
 
-Models (May 2026):
-  3.5 Flash ($1.50/$9)         — Frontier agentic + coding (default for second-opinion, think)
-  3.1 Pro Preview ($2-4/$12-18) — Legacy fallback for pure-math reasoning (ARC-AGI-style)
-  3.1 Flash-Lite ($0.25/$1.50) — Fastest, research & grounding (default for ask)
-  3.1 Flash-Lite Preview       — Backwards compat
+Models (whitelist — 2 only):
+  3.5 Flash ($1.50/$9)         — PRIMARY, default for all commands (agentic + coding + critique)
+  3.1 Pro Preview ($2-4/$12-18) — FALLBACK via -m, pure-math reasoning (ARC-AGI-style)
 
 Usage:
   python3 gemini.py ask "prompt"
   python3 gemini.py second-opinion "question" --context "context"
   python3 gemini.py ask "prompt" --grounded          # web-grounded answer
   python3 gemini.py ask "prompt" --save output.md
-  python3 gemini.py ask "prompt" -m gemini-3.1-flash-lite --grounded  # research mode
+  python3 gemini.py ask "prompt" --grounded  # research mode (Google Search tool)
   python3 gemini.py second-opinion @prompt.txt --image site.png --image ref.png  # visual review
   python3 gemini.py ask @prompt.txt --video https://www.youtube.com/watch?v=ID  # YouTube video analysis
   python3 gemini.py ask @prompt.txt --video path/to/clip.mp4 -m gemini-3.1-pro-preview  # local video
@@ -25,13 +23,16 @@ Video notes (Gemini 3.x):
   - --image and --video are mutually exclusive (one media type per request)
 
 Audit history:
-  2026-05-20: removed `analyze` + `review` commands (zero invocations across codebase),
-              removed `--seed` + `--focus` flags, removed `gemini-3-flash-preview`,
-              added `gemini-3.5-flash` (new default for second-opinion + think),
-              added `gemini-3.1-flash-lite` stable. See:
-              experiments/missions-methodology-adoption-20260520/phase-1-gap-analysis/gemini-client-audit-decisions.md
+  2026-05-20: removed `analyze` + `review` commands, removed `--seed` + `--focus` flags,
+              removed `gemini-3-flash-preview`, added `gemini-3.5-flash` (new default),
+              trimmed whitelist to 2 models.
 
-Env: GOOGLE_API_KEY (from .env or export)
+Key resolution (in order): the GOOGLE_API_KEY env var, else the global key file
+~/.gemini/api_key (plain text, key only). The env var wins when set, so a per-project
+`export` still overrides. NOTE: no `.env` is auto-loaded — a plain `GOOGLE_API_KEY=... in
+~/.env` does NOT reach a fresh non-interactive shell (the shell never sources it). Write
+the key once to ~/.gemini/api_key, or `export` it. This is the fix for the old
+"GOOGLE_API_KEY not set" failure that hit every shell without the export.
 """
 
 import argparse
@@ -140,6 +141,25 @@ def _build_video_part(video: str, client) -> tuple[object | None, str | None]:
     return None, f"File API upload failed: {type(e).__name__}: {e}"
 
 
+GLOBAL_KEY_FILE = os.path.expanduser("~/.gemini/api_key")
+
+
+def _resolve_api_key() -> str | None:
+  """Resolve the Gemini API key. The env var wins (a project `export` overrides);
+  otherwise fall back to the global key file ~/.gemini/api_key (plain text). This is
+  the durable fix for "GOOGLE_API_KEY not set" in fresh non-interactive shells that
+  never sourced a project .env — fix the wrapper once, not every caller."""
+  env_key = os.environ.get("GOOGLE_API_KEY")
+  if env_key and env_key.strip():
+    return env_key.strip()
+  try:
+    with open(GLOBAL_KEY_FILE, encoding="utf-8") as fh:
+      file_key = fh.read().strip()
+    return file_key or None
+  except OSError:
+    return None
+
+
 def call_gemini(
   prompt: str,
   model: str = DEFAULT_MODEL,
@@ -155,9 +175,12 @@ def call_gemini(
   video: str | None = None,
 ) -> dict:
   """Call Gemini SDK and return response + usage. Supports multimodal (text + images OR text + video)."""
-  api_key = os.environ.get("GOOGLE_API_KEY")
+  api_key = _resolve_api_key()
   if not api_key:
-    return {"error": "GOOGLE_API_KEY not set"}
+    return {
+      "error": "GOOGLE_API_KEY not set (env empty and ~/.gemini/api_key missing/empty). "
+      "Fix: mkdir -p ~/.gemini && printf '%s' YOUR_KEY > ~/.gemini/api_key && chmod 600 ~/.gemini/api_key"
+    }
 
   if model not in MODELS:
     return {"error": f"Invalid model: {model}. Valid: {', '.join(sorted(MODELS))}"}

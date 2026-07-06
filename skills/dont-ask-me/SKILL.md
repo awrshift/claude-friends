@@ -246,7 +246,7 @@ Legacy: `gemini-3.1-pro-preview` available via `-m` flag for pure-math reasoning
 The plugin marketplace install (`/plugin marketplace add awrshift/skill-dont-ask-me`) copies all skill files and the `idea-validator` subagent into the right places — but it cannot configure your API key or Python environment. Three manual steps remain:
 
 1. Get a Gemini API key at [aistudio.google.com](https://aistudio.google.com). Click "Create API Key".
-2. Add `GOOGLE_API_KEY=your_key_here` to your `.env` file.
+2. Store the key so any shell finds it — `mkdir -p ~/.gemini && printf '%s' 'your_key_here' > ~/.gemini/api_key && chmod 600 ~/.gemini/api_key`. (`gemini.py` reads `GOOGLE_API_KEY` first, then this file. A bare `GOOGLE_API_KEY=...` in `~/.env` does NOT work — nothing sources it in a fresh non-interactive shell.)
 3. Run `pip install google-genai`.
 
 If you install the skill manually (without the plugin marketplace), also copy the subagent into place so Boardroom Debate can find it:
@@ -294,6 +294,7 @@ Read on demand.
 - `references/critical-evaluation.md` — Why reviewer output is not the decision, with anti-pattern examples.
 - `references/models.md` — Gemini model specs, pricing, thinking levels, deprecation table.
 - `references/parameters.md` — Complete CLI argument reference.
+- `references/third-family-gpt.md` — **OPT-IN.** Add OpenAI GPT as a third reviewer family for the highest-stakes Boardroom Debates (needs a paid OpenAI key; the default two-family flow needs nothing extra).
 
 ## Migrating from skill-gemini or skill-brainstorm
 
