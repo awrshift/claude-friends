@@ -1,4 +1,4 @@
-# Gemini Models Reference — Don't Ask Me skill
+# Gemini Models Reference — Claude Friends skill
 
 Last updated: 2026-05-27 · re-verified 2026-07-06 against official `ai.google.dev` models + pricing (whitelist UNCHANGED). **Whitelist = 2 models** — `gemini-3.5-flash` (primary for all tasks, still GA/stable, pricing unchanged $1.50/$9) and `gemini-3.1-pro-preview` (fallback for pure-math reasoning where Flash falls short, still Preview). Nothing has displaced 3.5 Flash as the API's top general model. Note (2026-06-24): 3.5 Flash's *bare* default thinking effort moved HIGH→MEDIUM, but `second-opinion`/`think` pass HIGH explicitly, so they are unaffected.
 

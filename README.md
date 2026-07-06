@@ -32,7 +32,7 @@
 ## Install
 
 ```
-/plugin marketplace add awrshift/skill-dont-ask-me
+/plugin marketplace add awrshift/claude-friends
 ```
 
 Then set your Gemini key (free tier at [aistudio.google.com](https://aistudio.google.com)):
@@ -89,7 +89,7 @@ If none of these fit, just describe what you're stuck on. Claude figures out whi
 
 ## Renamed from "Don't Ask Me"
 
-This is the same skill, re-framed: it was never about *not* asking — it's about asking the right friends. Old install URLs (`awrshift/skill-dont-ask-me`) still work. If you had it installed as `dont-ask-me`, re-add the marketplace and install `claude-friends`; the CLI commands (`gemini.py`, `gpt.py`) are unchanged.
+This is the same skill, re-framed: it was never about *not* asking — it's about asking the right friends. The old repo slug (`awrshift/skill-dont-ask-me`) still resolves — GitHub redirects it to `awrshift/claude-friends`. If you had it installed as `dont-ask-me`, re-add the marketplace and install `claude-friends`; the CLI commands (`gemini.py`, `gpt.py`) are unchanged.
 
 ## License
 

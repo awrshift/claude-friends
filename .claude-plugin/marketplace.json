@@ -1,5 +1,5 @@
 {
-  "name": "awrshift-dont-ask-me",
+  "name": "awrshift-claude-friends",
   "owner": {
     "name": "Serhii Kravchenko",
     "email": "awrshift@proton.me"
@@ -7,7 +7,7 @@
   "metadata": {
     "description": "Claude has friends. On the calls that matter, it asks AIs from other families — Gemini, an isolated second Claude, optionally GPT — who catch the blind spots Claude can't see from the inside. Three styles, auto-picked by what you type. CLI-only, English-only docs.",
     "version": "3.0.0",
-    "homepage": "https://github.com/awrshift/skill-dont-ask-me"
+    "homepage": "https://github.com/awrshift/claude-friends"
   },
   "plugins": [
     {

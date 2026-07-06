@@ -66,7 +66,7 @@ Same message is non-negotiable. If you call them sequentially, the second review
 
 Protocol:
 
-0. Pre-flight check. Verify `~/.claude/agents/idea-validator.md` exists before attempting Boardroom Debate. If it's missing, tell the user: "Boardroom Debate needs the idea-validator subagent. Install with: `curl -sL https://raw.githubusercontent.com/awrshift/skill-dont-ask-me/main/agents/idea-validator.md -o ~/.claude/agents/idea-validator.md`". Then fall back to Devil's Advocate (single Gemini critique) for the current call.
+0. Pre-flight check. Verify `~/.claude/agents/idea-validator.md` exists before attempting Boardroom Debate. If it's missing, tell the user: "Boardroom Debate needs the idea-validator subagent. Install with: `curl -sL https://raw.githubusercontent.com/awrshift/claude-friends/main/agents/idea-validator.md -o ~/.claude/agents/idea-validator.md`". Then fall back to Devil's Advocate (single Gemini critique) for the current call.
 
 1. Claude writes one self-contained artifact describing the design, decision, or plan. Paste content inline. Never use `@file:` references in the artifact text — Gemini Flash silently hallucinates if `@file:` fails to load. Session #199 incident: a 14 KB audit plan sent via `@file:` came back as a plausible review citing audit IDs D1, F2, C4 that did not exist in the source.
 
@@ -243,7 +243,7 @@ Legacy: `gemini-3.1-pro-preview` available via `-m` flag for pure-math reasoning
 
 ## Setup
 
-The plugin marketplace install (`/plugin marketplace add awrshift/skill-dont-ask-me`) copies all skill files and the `idea-validator` subagent into the right places — but it cannot configure your API key or Python environment. Three manual steps remain:
+The plugin marketplace install (`/plugin marketplace add awrshift/claude-friends`) copies all skill files and the `idea-validator` subagent into the right places — but it cannot configure your API key or Python environment. Three manual steps remain:
 
 1. Get a Gemini API key at [aistudio.google.com](https://aistudio.google.com). Click "Create API Key".
 2. Store the key so any shell finds it — `mkdir -p ~/.gemini && printf '%s' 'your_key_here' > ~/.gemini/api_key && chmod 600 ~/.gemini/api_key`. (`gemini.py` reads `GOOGLE_API_KEY` first, then this file. A bare `GOOGLE_API_KEY=...` in `~/.env` does NOT work — nothing sources it in a fresh non-interactive shell.)
@@ -253,7 +253,7 @@ If you install the skill manually (without the plugin marketplace), also copy th
 
 ```bash
 mkdir -p ~/.claude/agents
-curl -sL https://raw.githubusercontent.com/awrshift/skill-dont-ask-me/main/agents/idea-validator.md \
+curl -sL https://raw.githubusercontent.com/awrshift/claude-friends/main/agents/idea-validator.md \
   -o ~/.claude/agents/idea-validator.md
 ```
 
@@ -301,13 +301,13 @@ Read on demand.
 If you previously installed `awrshift/skill-gemini` or `awrshift/skill-brainstorm`:
 
 1. Uninstall: `/plugin marketplace remove awrshift/skill-gemini` (and/or `awrshift/skill-brainstorm`).
-2. Install: `/plugin marketplace add awrshift/skill-dont-ask-me`.
+2. Install: `/plugin marketplace add awrshift/claude-friends`.
 3. All previous CLI commands work unchanged: `gemini.py ask`, `second-opinion`, `think`, `extract`, `--grounded`, `--image` behave identically. Point to `~/.claude/skills/claude-friends/scripts/gemini.py` instead of `~/.claude/skills/gemini/gemini.py`.
 4. New capabilities: Boardroom Debate (parallel dual validation with idea-validator subagent), Round-Table Discussion (was skill-brainstorm), Style Router (Claude picks based on user phrasing), Critical Evaluation Rule (explicit anti-patterns).
 
 `awrshift/skill-brainstorm` is archived with a pointer to this skill (functionality fully merged).
 
-`awrshift/skill-gemini` was renamed to `awrshift/skill-dont-ask-me` (GitHub redirect handles old install URLs).
+`awrshift/skill-gemini` was renamed to `awrshift/claude-friends` (GitHub redirect handles old install URLs).
 
 ## Why two model families
 
