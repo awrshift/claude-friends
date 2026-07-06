@@ -1,12 +1,12 @@
 ---
-name: dont-ask-me
-description: "Get a second opinion from a different model family when the user wants to validate or stress-test Claude's answer before trusting it. The skill is user-triggered (not automatic) — Claude activates it when the user signals uncertainty or explicitly asks for a cross-check. Use when the user says any of these (or semantically similar): SECOND-OPINION TRIGGERS — 'second opinion', 'give me a second opinion', 'sanity check', 'sanity check this', 'cross-check', 'cross-check this', 'am I missing something', 'stress-test this', 'review this', 'critique this', 'devil's advocate', 'thoughts?', 'is this right?', 'poke holes in this', 'what could go wrong', 'another perspective please'. FULL-REVIEW TRIGGERS — 'this is important', 'run a full review', 'big decision', 'high-stakes', 'high-stakes review', 'check before I send', 'before publishing', 'boardroom debate', 'dual validation', 'two independent opinions', 'don't let me ship something dumb', 'this can't be wrong', 'double-check this'. ROUND-TABLE TRIGGERS — 'help me choose', 'help me choose between', 'brainstorm options', 'I have several options', 'I have several paths', 'I have N angles', 'I have 3 angles on this', 'multiple paths', 'multiple options to weigh', 'diverge and converge', 'multi-round brainstorm', 'round-table discussion', 'compare these approaches', 'what's the best direction'. DIRECT-MODEL TRIGGERS — 'ask Gemini', 'ask Opus', 'what would Gemini say', 'let's get a second model on this'. Three review styles auto-picked by phrasing: Devil's Advocate (single critique), Boardroom Debate (parallel dual validation, the headline pattern), Round-Table Discussion (3-round brainstorm for multi-option convergence). Uses two model families (Gemini and an isolated Claude Opus subagent) so the reviewers don't share blind spots. Not for factual lookups; use Claude Code's WebSearch for those."
+name: claude-friends
+description: "Claude asks its friends — AIs from other families who think differently and catch the blind spots Claude can't see from the inside — before trusting an answer on a call that matters. User-triggered (not automatic): Claude activates it when the user signals uncertainty or asks to bring the friends in. Use when the user says any of these (or semantically similar): GUT-CHECK TRIGGERS — 'ask a friend', 'ask my friends', 'what do my friends think', 'second opinion', 'give me a second opinion', 'sanity check', 'sanity check this', 'cross-check', 'cross-check this', 'am I missing something', 'stress-test this', 'review this', 'critique this', 'devil's advocate', 'thoughts?', 'is this right?', 'poke holes in this', 'what could go wrong', 'another perspective please'. WHOLE-TABLE TRIGGERS — 'this is important', 'run a full review', 'ask everyone', 'gather the friends', 'big decision', 'high-stakes', 'high-stakes review', 'check before I send', 'before publishing', 'boardroom debate', 'dual validation', 'two independent opinions', 'don't let me ship something dumb', 'this can't be wrong', 'double-check this'. HASH-IT-OUT TRIGGERS — 'help me choose', 'help me choose between', 'brainstorm options', 'I have several options', 'I have several paths', 'I have N angles', 'I have 3 angles on this', 'multiple paths', 'multiple options to weigh', 'diverge and converge', 'multi-round brainstorm', 'round-table discussion', 'compare these approaches', 'what's the best direction'. DIRECT-FRIEND TRIGGERS — 'ask Gemini', 'ask Opus', 'ask GPT', 'what would Gemini say', 'let's get a second model on this'. Three styles auto-picked by phrasing: Devil's Advocate (one friend, quick critique), Boardroom Debate (the whole table in parallel, the headline pattern), Round-Table Discussion (3-round brainstorm for multi-option convergence). Uses different model families (Gemini and an isolated Claude Opus subagent; optional OpenAI GPT) so the friends don't share blind spots. Not for factual lookups; use Claude Code's WebSearch for those."
 allowed-tools: Bash, Read, Glob, Grep, Task, Write
 ---
 
-# Don't Ask Me
+# Claude Friends
 
-Cross-check Claude's own answer with a second AI before bringing it to the user. Three review styles, picked automatically by what the user typed. Two model families (Gemini and an isolated Claude Opus subagent) catch different blind spots than one model alone.
+Claude doesn't decide alone. On the calls that matter, it asks its friends — AIs from other families who think differently and catch the blind spots Claude can't see from the inside. Three styles, picked automatically by what the user typed. Different model families (Gemini + an isolated Claude with fresh eyes; optional OpenAI GPT) catch different blind spots than one model alone. It's not "second-guess yourself" — it's "ask people you trust before you ship."
 
 ## When to invoke
 
@@ -44,7 +44,7 @@ Decision rule:
 
 Example (Gemini):
 ```python
-Bash("python3 ~/.claude/skills/dont-ask-me/scripts/gemini.py second-opinion @prompt.md --save out.md")
+Bash("python3 ~/.claude/skills/claude-friends/scripts/gemini.py second-opinion @prompt.md --save out.md")
 ```
 
 Example (Opus subagent):
@@ -72,7 +72,7 @@ Protocol:
 
 2. One message with two tool calls:
    ```python
-   Bash("python3 ~/.claude/skills/dont-ask-me/scripts/gemini.py second-opinion @prompt.md --save gemini-out.md")
+   Bash("python3 ~/.claude/skills/claude-friends/scripts/gemini.py second-opinion @prompt.md --save gemini-out.md")
    Agent(subagent_type="idea-validator", prompt="<same artifact pasted inline>")
    ```
 
@@ -210,7 +210,7 @@ Real cost reality (Session #201 ADR sprint): 8 decisions, 6 dual-validations (so
 For direct invocation when Claude needs custom params.
 
 ```bash
-GEMINI=~/.claude/skills/dont-ask-me/scripts/gemini.py
+GEMINI=~/.claude/skills/claude-friends/scripts/gemini.py
 
 # Web-grounded ask (used internally by Round-Table Phase 0.5 + 3.5 for tech verification.
 # Not a user-facing review style. For factual lookups, use Claude Code's native WebSearch.)
@@ -302,7 +302,7 @@ If you previously installed `awrshift/skill-gemini` or `awrshift/skill-brainstor
 
 1. Uninstall: `/plugin marketplace remove awrshift/skill-gemini` (and/or `awrshift/skill-brainstorm`).
 2. Install: `/plugin marketplace add awrshift/skill-dont-ask-me`.
-3. All previous CLI commands work unchanged: `gemini.py ask`, `second-opinion`, `think`, `extract`, `--grounded`, `--image` behave identically. Point to `~/.claude/skills/dont-ask-me/scripts/gemini.py` instead of `~/.claude/skills/gemini/gemini.py`.
+3. All previous CLI commands work unchanged: `gemini.py ask`, `second-opinion`, `think`, `extract`, `--grounded`, `--image` behave identically. Point to `~/.claude/skills/claude-friends/scripts/gemini.py` instead of `~/.claude/skills/gemini/gemini.py`.
 4. New capabilities: Boardroom Debate (parallel dual validation with idea-validator subagent), Round-Table Discussion (was skill-brainstorm), Style Router (Claude picks based on user phrasing), Critical Evaluation Rule (explicit anti-patterns).
 
 `awrshift/skill-brainstorm` is archived with a pointer to this skill (functionality fully merged).

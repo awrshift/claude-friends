@@ -55,8 +55,8 @@ sequential (the later reviewer would see the earlier one's framing and echo it).
 alongside the existing two:
 
 ```python
-Bash("python3 ~/.claude/skills/dont-ask-me/scripts/gemini.py second-opinion @prompt.txt --save gemini-out.md")
-Bash("python3 ~/.claude/skills/dont-ask-me/scripts/gpt.py    second-opinion @prompt.txt --save gpt-out.md")
+Bash("python3 ~/.claude/skills/claude-friends/scripts/gemini.py second-opinion @prompt.txt --save gemini-out.md")
+Bash("python3 ~/.claude/skills/claude-friends/scripts/gpt.py    second-opinion @prompt.txt --save gpt-out.md")
 Agent(subagent_type="idea-validator", prompt="<same artifact pasted inline>")
 ```
 

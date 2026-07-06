@@ -2,7 +2,7 @@
 """
 OpenAI SDK CLI — direct OpenAI Responses-API calls via Python subprocess.
 
-The OPTIONAL third reviewer family for the dont-ask-me skill (Gemini + isolated Opus + GPT).
+The OPTIONAL third reviewer family for the Claude Friends skill (Gemini + isolated Opus + GPT).
 Sibling of gemini.py — same `second-opinion` contract, same `@file` + `--save` flags, same
 key-from-global-file discipline so a fresh non-interactive agent shell works with NO env prefix.
 
@@ -191,7 +191,7 @@ COMMANDS = {
 
 def main():
   parser = argparse.ArgumentParser(
-    description="OpenAI SDK CLI (Responses API) — optional third reviewer family for dont-ask-me",
+    description="OpenAI SDK CLI (Responses API) — optional third reviewer family for Claude Friends",
     formatter_class=argparse.RawDescriptionHelpFormatter,
   )
   parser.add_argument("command", choices=COMMANDS.keys(), help="Command to run")

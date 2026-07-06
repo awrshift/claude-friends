@@ -291,8 +291,8 @@ Where `{agent}` is the agent's identifier from the project (e.g., `rnd`, `cmo`, 
 
 **Setup:** Before first call, locate `gemini.py` and store its path. Check in order:
 1. `.claude/skills/brainstorm/scripts/gemini.py` (project-level)
-2. `~/.claude/skills/dont-ask-me/scripts/gemini.py` (global)
-3. `~/.claude/skills/dont-ask-me/scripts/gemini.py` (separate gemini skill)
+2. `~/.claude/skills/claude-friends/scripts/gemini.py` (global)
+3. `~/.claude/skills/claude-friends/scripts/gemini.py` (separate gemini skill)
 
 `GOOGLE_API_KEY` must be set in environment (from `.env` file or `export`).
 
