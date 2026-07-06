@@ -18,12 +18,12 @@
 <td width="50%"><img src="assets/carousel/02-repeat.png" alt="x50 times a day"></td>
 </tr>
 <tr>
-<td width="50%"><img src="assets/carousel/03-cheat-code.png" alt="The move: ask your friends"></td>
-<td width="50%"><img src="assets/carousel/04-isolated.png" alt="Different family, different blind spots"></td>
+<td width="50%"><img src="assets/carousel/03-friends.png" alt="Ask your friends"></td>
+<td width="50%"><img src="assets/carousel/04-blindspots.png" alt="Different minds, different blind spots"></td>
 </tr>
 <tr>
-<td width="50%"><img src="assets/carousel/05-synthesis.png" alt="Not consensus, not voting"></td>
-<td width="50%"><img src="assets/carousel/06-ship.png" alt="Ship with conviction"></td>
+<td width="50%"><img src="assets/carousel/05-notavote.png" alt="Not a vote — you still decide"></td>
+<td width="50%"><img src="assets/carousel/06-decide.png" alt="Decide with friends"></td>
 </tr>
 </table>
 
