@@ -28,6 +28,9 @@ jobs:
       # trace. This is the failure every new user hits first.
       - name: CLIs degrade honestly without a key
         run: |
+          # GitHub runs steps as `bash -e`, so a non-zero command inside $( ) aborts the step
+          # before we can inspect its exit code — and these commands are SUPPOSED to fail.
+          set +e
           set -uo pipefail
           mkdir -p /tmp/nokeys
           for s in skills/claude-friends/scripts/gemini.py skills/claude-friends/scripts/gpt.py; do
