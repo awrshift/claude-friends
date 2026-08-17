@@ -42,7 +42,7 @@ that file too.
 | `gpt-5.5` | **ESCALATION** via `-m gpt-5.5` — current GA flagship, highest-stakes only | $5.00 / $30.00 |
 
 Default is the half-price `gpt-5.4`: the third leg's marginal value over Gemini is usually modest, so
-reserve the flagship for reviews that truly warrant it. `gpt-5.6` is preview-only → not whitelisted
+reserve the flagship for reviews that truly warrant it. `gpt-5.6` was preview-only when this table was written; as of 2026-08-17 the API serves `gpt-5.6-luna`, `gpt-5.6-sol` and `gpt-5.6-terra`, so that line needs a fresh read of OpenAI's docs before anyone relies on it (D4 on the board). Still not whitelisted
 (same "no preview models" rule as Gemini).
 
 GPT-5.x are reasoning models: the only knob is `reasoning.effort` (`none/low/medium/high/xhigh` —
