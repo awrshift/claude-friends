@@ -19,7 +19,9 @@ Then say *"sanity check this"*, *"this is important"* or *"help me choose"* in a
 Claude picks the review style from your phrasing, runs the reviewers, and reports where they
 agree, where they split, and what it decided — reviewers are **input, never a vote**.
 
-![Ask your friends](assets/carousel/03-friends.png)
+<div align="center">
+  <img src="assets/carousel/03-friends.png" alt="Ask your friends" width="440">
+</div>
 
 ## Why more than one model
 
@@ -107,15 +109,15 @@ GPT is optional: `pip install -U openai`, a paid key in `~/.openai/api_key`, and
 
 <table>
 <tr>
-<td width="50%"><img src="assets/carousel/01-choice.png" alt="A choice with no choice"></td>
-<td width="50%"><img src="assets/carousel/02-repeat.png" alt="Fifty times a day"></td>
+<td width="50%"><img src="assets/carousel/01-choice.png" alt="A choice with no choice" width="330"></td>
+<td width="50%"><img src="assets/carousel/02-repeat.png" alt="Fifty times a day" width="330"></td>
 </tr>
 <tr>
-<td width="50%"><img src="assets/carousel/04-blindspots.png" alt="Different minds, different blind spots"></td>
-<td width="50%"><img src="assets/carousel/05-notavote.png" alt="Not a vote — you still decide"></td>
+<td width="50%"><img src="assets/carousel/04-blindspots.png" alt="Different minds, different blind spots" width="330"></td>
+<td width="50%"><img src="assets/carousel/05-notavote.png" alt="Not a vote — you still decide" width="330"></td>
 </tr>
 <tr>
-<td width="50%"><img src="assets/carousel/06-decide.png" alt="Decide with friends"></td>
+<td width="50%"><img src="assets/carousel/06-decide.png" alt="Decide with friends" width="330"></td>
 <td width="50%"></td>
 </tr>
 </table>
