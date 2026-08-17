@@ -19,6 +19,11 @@ jobs:
       - name: Repo integrity
         run: python3 tools/check-repo.py
 
+      # Install what the docs tell a user to install — if that instruction is wrong or
+      # incomplete, this step is where it shows.
+      - name: Documented dependencies
+        run: pip install --quiet google-genai openai
+
       # The CLIs must stay usable without a key: a missing key is a clear message, not a stack
       # trace. This is the failure every new user hits first.
       - name: CLIs degrade honestly without a key
@@ -28,7 +33,8 @@ jobs:
           for s in skills/claude-friends/scripts/gemini.py skills/claude-friends/scripts/gpt.py; do
             # env -i: the scripts also read ~/.gemini/api_key and ~/.openai/api_key, so a
             # bare "unset the variable" test passes on any machine that has the files.
-            out=$(env -i HOME=/tmp/nokeys PATH="$PATH" python3 "$s" ask "hi" 2>&1); code=$?
+            out=$(env -i HOME=/tmp/nokeys PATH="$PATH" PYTHONPATH="$(python3 -c 'import site;print(site.getsitepackages()[0])')" \
+                    python3 "$s" ask "hi" 2>&1); code=$?
             echo "$out" | head -3
             if [ "$code" -eq 0 ]; then echo "$s: exited 0 without a key"; exit 1; fi
             echo "$out" | grep -qiE "key|credential" || { echo "$s: failure message does not mention the missing key"; exit 1; }

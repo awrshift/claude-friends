@@ -81,7 +81,7 @@ A free key from [aistudio.google.com](https://aistudio.google.com) is enough to 
 `GOOGLE_API_KEY` in the environment also works and takes precedence. A bare line in `~/.env`
 does **not** — nothing sources it in a fresh shell.
 
-GPT is optional and needs a paid OpenAI key in `~/.openai/api_key`; see
+GPT is optional: `pip install -U openai`, a paid key in `~/.openai/api_key`, and the details in
 [`references/third-family-gpt.md`](skills/claude-friends/references/third-family-gpt.md).
 
 ## What it will not do
