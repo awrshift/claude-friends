@@ -1,0 +1,59 @@
+name: checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  repo-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Manifests agree, declared skills exist, scripts compile, links and assets resolve,
+      # and no document names a model outside the whitelist. Stdlib only, no keys needed.
+      - name: Repo integrity
+        run: python3 tools/check-repo.py
+
+      # Install what the docs tell a user to install — if that instruction is wrong or
+      # incomplete, this step is where it shows.
+      - name: Documented dependencies
+        run: pip install --quiet google-genai openai
+
+      # The CLIs must stay usable without a key: a missing key is a clear message, not a stack
+      # trace. This is the failure every new user hits first.
+      - name: CLIs degrade honestly without a key
+        run: |
+          # GitHub runs steps as `bash -e`, so a non-zero command inside $( ) aborts the step
+          # before we can inspect its exit code — and these commands are SUPPOSED to fail.
+          set +e
+          set -uo pipefail
+          mkdir -p /tmp/nokeys
+          for s in skills/claude-friends/scripts/gemini.py skills/claude-friends/scripts/gpt.py; do
+            # env -i: the scripts also read ~/.gemini/api_key and ~/.openai/api_key, so a
+            # bare "unset the variable" test passes on any machine that has the files.
+            out=$(env -i HOME=/tmp/nokeys PATH="$PATH" PYTHONPATH="$(python3 -c 'import site;print(site.getsitepackages()[0])')" \
+                    python3 "$s" ask "hi" 2>&1); code=$?
+            echo "$out" | head -3
+            if [ "$code" -eq 0 ]; then echo "$s: exited 0 without a key"; exit 1; fi
+            echo "$out" | grep -qiE "key|credential" || { echo "$s: failure message does not mention the missing key"; exit 1; }
+            echo "  ok: $(basename "$s")"
+          done
+
+      - name: Skill description stays inside its context budget
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          from pathlib import Path
+          body = Path("skills/claude-friends/SKILL.md").read_text()
+          fm = re.match(r"---\n(.*?)\n---", body, re.S).group(1)
+          desc = re.search(r'description:\s*"(.*?)"\n', fm, re.S)
+          n = len(desc.group(1)) if desc else 0
+          # every character here sits in context for every session of every user
+          print(f"description: {n} chars")
+          sys.exit(1 if n > 1200 else 0)
+          PY

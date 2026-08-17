@@ -6,16 +6,15 @@
   },
   "metadata": {
     "description": "Claude has friends. On the calls that matter, it asks AIs from other families — Gemini, an isolated second Claude, optionally GPT — who catch the blind spots Claude can't see from the inside. Three styles, auto-picked by what you type. CLI-only, English-only docs.",
-    "version": "3.0.0",
-    "homepage": "https://github.com/awrshift/claude-friends"
+    "version": "4.0.0"
   },
   "plugins": [
     {
       "name": "claude-friends",
-      "description": "Claude doesn't decide alone. On the calls that matter it asks its friends — Gemini (a different model family) and an isolated Claude with fresh eyes (same family, no parent context), optionally OpenAI GPT — who each catch blind spots the others miss. Three styles auto-picked by what you type: Devil's Advocate (one friend, quick critique), Boardroom Debate (the whole table in parallel, the headline pattern), Round-Table Discussion (3-round brainstorm for multi-option convergence). Not a second opinion you drag out of a reluctant assistant — a room of friends you trust. CLI-only, no MCP. Merges previous skill-gemini + skill-brainstorm + dont-ask-me.",
+      "description": "Claude asks AIs from other families before the calls that matter — Gemini (different training), an isolated second Claude with no memory of your conversation, optionally GPT. Three styles picked from what you type: one friend for a gut-check, the whole table for high-stakes, a multi-round round-table for choosing between paths. Reviewers are input, never a vote — you still decide. CLI only, no MCP.",
       "source": "./",
       "strict": false,
-      "version": "3.0.0",
+      "version": "4.0.0",
       "category": "productivity",
       "keywords": [
         "claude-friends",
